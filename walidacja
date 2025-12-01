@@ -1,0 +1,24 @@
+class AddListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        String tekst = view.poleTekstowe.getText().trim();
+
+        // --- WALIDACJA: tylko litery i spacje ---
+        if (tekst.isEmpty()) {
+            view.pokazBlad("Pole treści nie może być puste!");
+            return;
+        }
+
+        if (!tekst.matches("[A-Za-zÀ-ž ]+")) {
+            view.pokazBlad("Treść może zawierać tylko litery i spacje!");
+            return;
+        }
+
+        // --- Zapis do bazy ---
+        dao.dodaj(new Zadanie(tekst));
+
+        odswiezListe();
+        view.poleTekstowe.setText("");
+    }
+}

@@ -1,0 +1,63 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class SwingWorkerExample extends JFrame {
+    private JButton startButton;
+    private JLabel statusLabel;
+
+    public SwingWorkerExample() {
+        setTitle("Wersja Naprawiona – SwingWorker");
+        setSize(300, 150);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+
+        startButton = new JButton("Start");
+        startButton.setBounds(20, 20, 100, 30);
+        add(startButton);
+
+        statusLabel = new JLabel("Status: czekam...");
+        statusLabel.setBounds(20, 60, 200, 30);
+        add(statusLabel);
+
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // ✔ POPRAWNE — użycie SwingWorker
+                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        for (int i = 0; i < 5; i++) {
+                            Thread.sleep(1000);
+
+                            // wysyłanie statusu do process()
+                            publish("Pracuję... " + (i + 1) + "s");
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void process(List<String> chunks) {
+                        // odbieramy ostatnią wartość
+                        String latest = chunks.get(chunks.size() - 1);
+                        statusLabel.setText(latest);
+                    }
+
+                    @Override
+                    protected void done() {
+                        statusLabel.setText("Zakończono pomyślnie!");
+                    }
+                };
+
+                worker.execute(); // uruchom w tle
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new SwingWorkerExample().setVisible(true));
+    }
+}
